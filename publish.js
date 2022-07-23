@@ -1,7 +1,6 @@
 const { assert } = require('chai')
 const { SHA256 } = require('crypto-js')
 const {
-      Aquarius,
       FixedRateExchange,
       getHash,
       Nft,
@@ -75,7 +74,6 @@ async function publish() {
     'providerUri' : 'https://v4.provider.rinkeby.oceanprotocol.com',
     'downloads.path': 'consume-downloads',
     }
-    aquarius = new Aquarius(config.metadataCacheUri)
     providerUrl = config.providerUri
 
     console.log(`Aquarius URL: ${config.metadataCacheUri}`)
