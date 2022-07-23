@@ -173,7 +173,6 @@ async function publish() {
         withMint: false
     }
 
-    console.log("GOT HERE")
     const tx = await factory.createNftErc20WithFixedRate(
         publisherAccount.address,
         nftParams,
@@ -182,11 +181,54 @@ async function publish() {
     )
     
   
-    // freNftAddress = tx.events.NFTCreated.returnValues[0]
-    // freDatatokenAddress = tx.events.TokenCreated.returnValues[0]
-    // freAddress = tx.events.NewFixedRate.returnValues.exchangeContract
-    // freId = tx.events.NewFixedRate.returnValues.exchangeId
-    // console.log('got here')
+    freNftAddress = tx.events.NFTCreated.returnValues[0]
+    freDatatokenAddress = tx.events.TokenCreated.returnValues[0]
+    freAddress = tx.events.NewFixedRate.returnValues.exchangeContract
+    freId = tx.events.NewFixedRate.returnValues.exchangeId
+
+    console.log(`Fixed rate exchange NFT address: ${freNftAddress}`)
+    console.log(`Fixed rate exchange Datatoken address: ${freDatatokenAddress}`)
+    console.log(`Fixed rate exchange address: ${freAddress}`)
+    console.log(`Fixed rate exchange Id: ${freId}`)
+
+    // 2.5 Set metadata in the fixed rate exchange NFT
+    const nft = new Nft(web3)
+
+    DDO.chainId = await web3.eth.getChainId()
+    DDO.id =
+      'did:op:' +
+      SHA256(web3.utils.toChecksumAddress(freNftAddress) + DDO.chainId.toString(10))
+    DDO.nftAddress = freNftAddress
+
+    ASSET_URL.datatokenAddress = freDatatokenAddress
+    ASSET_URL.nftAddress = freNftAddress
+    const encryptedFiles = await ProviderInstance.encrypt(ASSET_URL, providerUrl)
+    DDO.services[0].files = await encryptedFiles
+    DDO.services[0].datatokenAddress = freDatatokenAddress
+
+    console.log(`DID: ${DDO.id}`)
+
+    const providerResponse = await ProviderInstance.encrypt(DDO, providerUrl)
+    const encryptedDDO = await providerResponse
+    const metadataHash = getHash(JSON.stringify(DDO))
+    await nft.setMetadata(
+      freNftAddress,
+      publisherAccount.address,
+      0,
+      providerUrl,
+      '',
+      '0x2',
+      encryptedDDO,
+      '0x' + metadataHash
+    )
+
+    const fixedRate = new FixedRateExchange(web3, freAddress)
+    const oceanAmount = await (
+      await fixedRate.calcBaseInGivenOutDT(freId, '1')
+    ).baseTokenAmount
+
+    console.log(`Price of 1 ${FRE_NFT_SYMBOL} is ${oceanAmount} OCEAN`)
+
       
 }
 
