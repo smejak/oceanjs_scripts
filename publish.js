@@ -112,7 +112,7 @@ async function publish() {
     console.log(`Provider URL: ${providerUrl}`)
 
     // 1. ACCOUNTS & CONTRACTS
-    const web3 = new Web3(providerUrl=config.providerUri)
+    const web3 = new Web3(providerUrl=config.nodeUri)
     // console.log(web3)
     // const accounts = await web3.eth.getAccounts()
     // publisherAccount = accounts[0]
@@ -137,7 +137,6 @@ async function publish() {
         return data.development
     }
     addresses = getAddresses()
-    console.log(addresses)
 
     // 2. PUBLISH DATA NFT & DATATOKEN WITH FIXED RATE EXCHANGE
     const factory = new NftFactory(addresses.ERC721Factory, web3)
@@ -173,9 +172,9 @@ async function publish() {
         allowedConsumer: ZERO_ADDRESS,
         withMint: false
     }
-  
+
     const tx = await factory.createNftErc20WithFixedRate(
-        publisherAccount,
+        publisherAccount.address,
         nftParams,
         erc20Params,
         freParams
