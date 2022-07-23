@@ -102,4 +102,5 @@ config = {
 aquarius = new Aquarius(config.metadataCacheUri)
 providerUrl = config.providerUri
 
-console.log(aquarius)
+console.log(`Aquarius URL: ${config.metadataCacheUri}`)
+console.log(`Provider URL: ${providerUrl}`)
