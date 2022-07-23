@@ -112,7 +112,7 @@ async function publish() {
     console.log(`Provider URL: ${providerUrl}`)
 
     // 1. ACCOUNTS & CONTRACTS
-    const web3 = new Web3(providerUrl=config.nodeUri)
+    const web3 = new Web3(process.env.NODE_URI || 'http://127.0.0.1:8545') // to configure for rinkeby, see https://github.com/oceanprotocol/ocean.js/blob/efa3839d10befdbc35e16e61c8e9bf310039970b/src/utils/ConfigHelper.ts
     // console.log(web3)
     // const accounts = await web3.eth.getAccounts()
     // publisherAccount = accounts[0]
@@ -147,7 +147,7 @@ async function publish() {
         templateIndex: 1,
         tokenURI: '',
         transferable: true,
-        owner: publisherAccount
+        owner: publisherAccount.address
     }
   
     const erc20Params = {
@@ -156,15 +156,15 @@ async function publish() {
         feeAmount: '0',
         paymentCollector: ZERO_ADDRESS,
         feeToken: ZERO_ADDRESS,
-        minter: publisherAccount,
+        minter: publisherAccount.address,
         mpFeeAddress: ZERO_ADDRESS
     }
 
     const freParams = {
         fixedRateAddress: addresses.FixedPrice,
         baseTokenAddress: addresses.Ocean,
-        owner: publisherAccount,
-        marketFeeCollector: publisherAccount,
+        owner: publisherAccount.address,
+        marketFeeCollector: publisherAccount.address,
         baseTokenDecimals: 18,
         datatokenDecimals: 18,
         fixedRate: '1',
@@ -173,12 +173,14 @@ async function publish() {
         withMint: false
     }
 
+    console.log("GOT HERE")
     const tx = await factory.createNftErc20WithFixedRate(
         publisherAccount.address,
         nftParams,
         erc20Params,
         freParams
     )
+    
   
     // freNftAddress = tx.events.NFTCreated.returnValues[0]
     // freDatatokenAddress = tx.events.TokenCreated.returnValues[0]
