@@ -1,29 +1,12 @@
 const { assert } = require('chai')
 const { SHA256 } = require('crypto-js')
 const {
-      AmountsOutMaxFee,
-      approve,
       Aquarius,
-      balance,
-      Config,
-      Datatoken,
-      Dispenser,
-      DispenserCreationParams,
-      downloadFile,
-      Erc20CreateParams,
-      Files,
       FixedRateExchange,
-      FreCreationParams,
       getHash,
       Nft,
-      NftCreateData,
       NftFactory,
-      Pool,
-      PoolCreationParams,
-      ProviderFees,
       ProviderInstance,
-      TokenInOutMarket,
-      transfer,
       ZERO_ADDRESS
 } = require('@oceanprotocol/lib')
 
@@ -34,29 +17,16 @@ const homedir = require('os')
 async function publish() {
     // 0. SETUP
     let config
-    let aquarius
     let providerUrl
     let publisherAccount
-    let consumerAccount
-    let stakerAccount
     let addresses
-    let poolNftAddress
-    let poolDatatokenAddress
-    let poolAddress
     let freNftAddress
     let freDatatokenAddress
     let freAddress
     let freId
-    let dispenserNftAddress
-    let dispenserDatatokenAddress
-    let dispenserAddress
 
-    const POOL_NFT_NAME = 'Datatoken 1'
-    const POOL_NFT_SYMBOL = 'DT1'
     const FRE_NFT_NAME = 'Datatoken 2'
     const FRE_NFT_SYMBOL = 'DT2'
-    const DISP_NFT_NAME = 'Datatoken 3'
-    const DISP_NFT_SYMBOL = 'DT3'
 
     const ASSET_URL = {
         datatokenAddress: '0x0',
@@ -113,17 +83,9 @@ async function publish() {
 
     // 1. ACCOUNTS & CONTRACTS
     const web3 = new Web3(process.env.NODE_URI || 'http://127.0.0.1:8545') // to configure for rinkeby, see https://github.com/oceanprotocol/ocean.js/blob/efa3839d10befdbc35e16e61c8e9bf310039970b/src/utils/ConfigHelper.ts
-    // console.log(web3)
-    // const accounts = await web3.eth.getAccounts()
-    // publisherAccount = accounts[0]
-    // publisherAccount = web3.eth.accounts.create()
     publisherAccount = web3.eth.accounts.privateKeyToAccount('0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209')
-    // consumerAccount = accounts[1]
-    // stakerAccount = accounts[2]
 
     console.log(`Publisher account address: ${publisherAccount.address}`)
-    // console.log(`Consumer account address: ${consumerAccount}`)
-    // console.log(`Staker account address: ${stakerAccount}`)
     
     const getAddresses = () => {
         const data = JSON.parse(
