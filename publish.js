@@ -27,80 +27,117 @@ const {
       ZERO_ADDRESS
 } = require('@oceanprotocol/lib')
 
-let config
-let aquarius
-let providerUrl
-let publisherAccount
-let consumerAccount
-let stakerAccount
-let addresses
-let poolNftAddress
-let poolDatatokenAddress
-let poolAddress
-let freNftAddress
-let freDatatokenAddress
-let freAddress
-let freId
-let dispenserNftAddress
-let dispenserDatatokenAddress
-let dispenserAddress
+const Web3 = require('web3')
+const fs = require('fs')
+const homedir = require('os')
 
-const POOL_NFT_NAME = 'Datatoken 1'
-const POOL_NFT_SYMBOL = 'DT1'
-const FRE_NFT_NAME = 'Datatoken 2'
-const FRE_NFT_SYMBOL = 'DT2'
-const DISP_NFT_NAME = 'Datatoken 3'
-const DISP_NFT_SYMBOL = 'DT3'
+async function publish() {
+    // 0. SETUP
+    let config
+    let aquarius
+    let providerUrl
+    let publisherAccount
+    let consumerAccount
+    let stakerAccount
+    let addresses
+    let poolNftAddress
+    let poolDatatokenAddress
+    let poolAddress
+    let freNftAddress
+    let freDatatokenAddress
+    let freAddress
+    let freId
+    let dispenserNftAddress
+    let dispenserDatatokenAddress
+    let dispenserAddress
 
-const ASSET_URL = {
-    datatokenAddress: '0x0',
-    nftAddress: '0x0',
-    files: [
-      {
-        type: 'url',
-        url: 'https://raw.githubusercontent.com/oceanprotocol/testdatasets/main/shs_dataset_test.txt',
-        method: 'GET'
-      }
-    ]
-}
+    const POOL_NFT_NAME = 'Datatoken 1'
+    const POOL_NFT_SYMBOL = 'DT1'
+    const FRE_NFT_NAME = 'Datatoken 2'
+    const FRE_NFT_SYMBOL = 'DT2'
+    const DISP_NFT_NAME = 'Datatoken 3'
+    const DISP_NFT_SYMBOL = 'DT3'
 
-const DDO = {
-    '@context': ['https://w3id.org/did/v1'],
-    id: '',
-    version: '4.1.0',
-    chainId: 4,
-    nftAddress: '0x0',
-    metadata: {
-      created: '2021-12-20T14:35:20Z',
-      updated: '2021-12-20T14:35:20Z',
-      type: 'dataset',
-      name: 'dataset-name',
-      description: 'Ocean protocol test dataset description',
-      author: 'oceanprotocol-team',
-      license: 'MIT'
-    },
-    services: [
-      {
-        id: 'testFakeId',
-        type: 'access',
-        files: '',
+    const ASSET_URL = {
         datatokenAddress: '0x0',
-        serviceEndpoint: 'https://v4.provider.rinkeby.oceanprotocol.com',
-        timeout: 0
-      }
-    ]
+        nftAddress: '0x0',
+        files: [
+        {
+            type: 'url',
+            url: 'https://raw.githubusercontent.com/oceanprotocol/testdatasets/main/shs_dataset_test.txt',
+            method: 'GET'
+        }
+        ]
+    }
+
+    const DDO = {
+        '@context': ['https://w3id.org/did/v1'],
+        id: '',
+        version: '4.1.0',
+        chainId: 4,
+        nftAddress: '0x0',
+        metadata: {
+        created: '2021-12-20T14:35:20Z',
+        updated: '2021-12-20T14:35:20Z',
+        type: 'dataset',
+        name: 'dataset-name',
+        description: 'Ocean protocol test dataset description',
+        author: 'oceanprotocol-team',
+        license: 'MIT'
+        },
+        services: [
+        {
+            id: 'testFakeId',
+            type: 'access',
+            files: '',
+            datatokenAddress: '0x0',
+            serviceEndpoint: 'https://v4.provider.rinkeby.oceanprotocol.com',
+            timeout: 0
+        }
+        ]
+    }
+
+    config = {
+    'network': 'rinkeby',
+    'nodeUri': 'https://rinkeby.infura.io/v3',
+    'BLOCK_CONFIRMATIONS': 0,
+    'metadataCacheUri' : 'https://v4.aquarius.oceanprotocol.com',
+    'providerUri' : 'https://v4.provider.rinkeby.oceanprotocol.com',
+    'downloads.path': 'consume-downloads',
+    }
+    aquarius = new Aquarius(config.metadataCacheUri)
+    providerUrl = config.providerUri
+
+    console.log(`Aquarius URL: ${config.metadataCacheUri}`)
+    console.log(`Provider URL: ${providerUrl}`)
+
+    // 1. ACCOUNTS & CONTRACTS
+    const web3 = new Web3(providerUrl=config.providerUri)
+    // console.log(web3)
+    // const accounts = await web3.eth.getAccounts()
+    // publisherAccount = accounts[0]
+    publisherAccount = web3.eth.accounts.create()
+    // consumerAccount = accounts[1]
+    // stakerAccount = accounts[2]
+
+    console.log(`Publisher account address: ${publisherAccount.address}`)
+    // console.log(`Consumer account address: ${consumerAccount}`)
+    // console.log(`Staker account address: ${stakerAccount}`)
+    
+    const getAddresses = () => {
+        const data = JSON.parse(
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.readFileSync(
+            process.env.ADDRESS_FILE ||
+              `${homedir}/.ocean/ocean-contracts/artifacts/address.json`,
+            'utf8'
+          )
+        )
+        return data.development
+    }
+    addresses = getAddresses()
+    console.log(addresses)
+      
 }
 
-config = {
-   'network': 'rinkeby',
-   'nodeUri': 'https://rinkeby.infura.io/v3',
-   'BLOCK_CONFIRMATIONS': 0,
-   'metadataCacheUri' : 'https://v4.aquarius.oceanprotocol.com',
-   'providerUri' : 'https://v4.provider.rinkeby.oceanprotocol.com',
-   'downloads.path': 'consume-downloads',
-}
-aquarius = new Aquarius(config.metadataCacheUri)
-providerUrl = config.providerUri
-
-console.log(`Aquarius URL: ${config.metadataCacheUri}`)
-console.log(`Provider URL: ${providerUrl}`)
+publish()
