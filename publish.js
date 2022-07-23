@@ -1,4 +1,3 @@
-const { assert } = require('chai')
 const { SHA256 } = require('crypto-js')
 const {
       FixedRateExchange,
