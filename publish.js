@@ -27,8 +27,6 @@ const {
       ZERO_ADDRESS
 } = require('@oceanprotocol/lib')
 
-console.log(ZERO_ADDRESS)
-
 let config
 let aquarius
 let providerUrl
@@ -91,4 +89,17 @@ const DDO = {
         timeout: 0
       }
     ]
- }
+}
+
+config = {
+   'network': 'rinkeby',
+   'nodeUri': 'https://rinkeby.infura.io/v3',
+   'BLOCK_CONFIRMATIONS': 0,
+   'metadataCacheUri' : 'https://v4.aquarius.oceanprotocol.com',
+   'providerUri' : 'https://v4.provider.rinkeby.oceanprotocol.com',
+   'downloads.path': 'consume-downloads',
+}
+aquarius = new Aquarius(config.metadataCacheUri)
+providerUrl = config.providerUri
+
+console.log(aquarius)
