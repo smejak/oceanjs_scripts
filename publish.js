@@ -116,7 +116,8 @@ async function publish() {
     // console.log(web3)
     // const accounts = await web3.eth.getAccounts()
     // publisherAccount = accounts[0]
-    publisherAccount = web3.eth.accounts.create()
+    // publisherAccount = web3.eth.accounts.create()
+    publisherAccount = web3.eth.accounts.privateKeyToAccount('0xef4b441145c1d0f3b4bc6d61d29f5c6e502359481152f869247c7a4244d45209')
     // consumerAccount = accounts[1]
     // stakerAccount = accounts[2]
 
@@ -137,6 +138,54 @@ async function publish() {
     }
     addresses = getAddresses()
     console.log(addresses)
+
+    // 2. PUBLISH DATA NFT & DATATOKEN WITH FIXED RATE EXCHANGE
+    const factory = new NftFactory(addresses.ERC721Factory, web3)
+
+    const nftParams = {
+        name: FRE_NFT_NAME,
+        symbol: FRE_NFT_SYMBOL,
+        templateIndex: 1,
+        tokenURI: '',
+        transferable: true,
+        owner: publisherAccount
+    }
+  
+    const erc20Params = {
+        templateIndex: 1,
+        cap: '100000',
+        feeAmount: '0',
+        paymentCollector: ZERO_ADDRESS,
+        feeToken: ZERO_ADDRESS,
+        minter: publisherAccount,
+        mpFeeAddress: ZERO_ADDRESS
+    }
+
+    const freParams = {
+        fixedRateAddress: addresses.FixedPrice,
+        baseTokenAddress: addresses.Ocean,
+        owner: publisherAccount,
+        marketFeeCollector: publisherAccount,
+        baseTokenDecimals: 18,
+        datatokenDecimals: 18,
+        fixedRate: '1',
+        marketFee: '0.001',
+        allowedConsumer: ZERO_ADDRESS,
+        withMint: false
+    }
+  
+    const tx = await factory.createNftErc20WithFixedRate(
+        publisherAccount,
+        nftParams,
+        erc20Params,
+        freParams
+    )
+  
+    // freNftAddress = tx.events.NFTCreated.returnValues[0]
+    // freDatatokenAddress = tx.events.TokenCreated.returnValues[0]
+    // freAddress = tx.events.NewFixedRate.returnValues.exchangeContract
+    // freId = tx.events.NewFixedRate.returnValues.exchangeId
+    // console.log('got here')
       
 }
 
